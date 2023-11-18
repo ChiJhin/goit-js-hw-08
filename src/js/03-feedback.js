@@ -23,11 +23,8 @@ function onFormSubmit(evt) {
   if (!email.value || !message.value) {
     return alert('Заповніть форму!');
   }
-  const formData = {
-    email: email.value,
-    message: message.value,
-  };
-  console.log(formData);
+
+  console.log(parsedStorage);
   form.reset();
   localStorage.removeItem(STORAGE_KEY);
   delete storage.email;

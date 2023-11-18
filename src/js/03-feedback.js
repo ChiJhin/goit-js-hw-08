@@ -1,46 +1,51 @@
 import throttle from 'lodash.throttle';
 
 const form = document.querySelector('.feedback-form');
+const email = form.elements.email;
+const message = form.elements.message;
 
 const STORAGE_KEY = 'feedback-form-state';
 
 const storage = {};
 
-updateForm();
-
-form.addEventListener('input', throttle(onFormInput, 500));
-form.addEventListener('submit', onFormSubmit);
-
-function onFormInput(evt) {
-  storage[evt.target.name] = evt.target.value;
+function onInputSave({ target }) {
+  storage[target.name] = target.value;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(storage));
 }
 
 function onFormSubmit(evt) {
   evt.preventDefault();
+
   const {
     elements: { email, message },
   } = evt.target;
 
   if (!email.value || !message.value) {
-    return window.alert('Заповніть форму!');
+    return alert('Заповніть форму!');
   }
-  console.log({ email: email.value, message: message.value });
+  const formData = {
+    email: email.value,
+    message: message.value,
+  };
+  console.log(formData);
   form.reset();
   localStorage.removeItem(STORAGE_KEY);
   delete storage.email;
   delete storage.message;
 }
 
-function updateForm() {
-  if (!localStorage.getItem(STORAGE_KEY)) {
-    return;
-  }
-  const savedForm = JSON.parse(localStorage.getItem(STORAGE_KEY));
-  console.log(savedForm);
+form.addEventListener('input', throttle(onInputSave, 500));
+form.addEventListener('submit', onFormSubmit);
 
-  Object.entries(savedForm).forEach(([name, value]) => {
-    storage[name] = value;
-    form.elements[name].value = value;
-  });
+const savedStorage = localStorage.getItem(STORAGE_KEY);
+
+const parsedStorage = JSON.parse(savedStorage);
+
+checkForm();
+
+function checkForm() {
+  if (savedStorage) {
+    email.value = parsedStorage.email;
+    message.value = parsedStorage.message;
+  }
 }

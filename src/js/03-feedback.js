@@ -1,5 +1,7 @@
 import throttle from 'lodash.throttle';
 
+import stor from './storage';
+
 const form = document.querySelector('.feedback-form');
 const email = form.elements.email;
 const message = form.elements.message;
@@ -10,7 +12,7 @@ const storage = {};
 
 function onInputSave({ target }) {
   storage[target.name] = target.value;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(storage));
+  stor.save(STORAGE_KEY, storage);
 }
 
 function onFormSubmit(evt) {
@@ -21,7 +23,7 @@ function onFormSubmit(evt) {
   } = evt.target;
 
   if (!email.value || !message.value) {
-    return alert('Заповніть форму!');
+    return alert('Заповніть повністю форму!!!');
   }
   const formData = {
     email: email.value,
@@ -29,7 +31,7 @@ function onFormSubmit(evt) {
   };
   console.log(formData);
   form.reset();
-  localStorage.removeItem(STORAGE_KEY);
+  stor.remove(STORAGE_KEY);
   delete storage.email;
   delete storage.message;
 }
@@ -37,15 +39,13 @@ function onFormSubmit(evt) {
 form.addEventListener('input', throttle(onInputSave, 500));
 form.addEventListener('submit', onFormSubmit);
 
-const savedStorage = localStorage.getItem(STORAGE_KEY);
-
-const parsedStorage = JSON.parse(savedStorage);
+const savedStorage = stor.load(STORAGE_KEY);
 
 checkForm();
 
 function checkForm() {
   if (savedStorage) {
-    email.value = parsedStorage.email;
-    message.value = parsedStorage.message;
+    email.value = savedStorage.email;
+    message.value = savedStorage.message;
   }
 }

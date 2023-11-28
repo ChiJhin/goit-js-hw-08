@@ -45,7 +45,9 @@ checkForm();
 
 function checkForm() {
   if (savedStorage) {
-    email.value = savedStorage.email;
-    message.value = savedStorage.message;
+    Object.entries(savedStorage).forEach(([name, value]) => {
+      storage[name] = value;
+      form.elements[name].value = value;
+    });
   }
 }
